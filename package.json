@@ -20,6 +20,7 @@
     "monitor"
   ],
   "license": "MIT",
+  "icon": "images/extension-icon-128.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/kail85/cpu-ram-gpu-status-vscode"
