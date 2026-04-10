@@ -1,0 +1,63 @@
+{
+  "name": "cpu-ram-gpu-status",
+  "displayName": "CPU RAM GPU Status",
+  "description": "Shows CPU usage, RAM usage, and GPU VRAM in the VS Code status bar.",
+  "version": "0.1.0",
+  "publisher": "kylewang",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "cpu",
+    "ram",
+    "gpu",
+    "nvidia",
+    "amd",
+    "status bar",
+    "monitor"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kail85/cpu-ram-gpu-status-vscode"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cpuRamGpuStatus.selectGpu",
+        "title": "CPU RAM GPU Status: Select GPU to Display"
+      }
+    ],
+    "configuration": {
+      "title": "CPU RAM GPU Status",
+      "properties": {
+        "cpuRamGpuStatus.pollInterval": {
+          "type": "number",
+          "default": 2000,
+          "minimum": 500,
+          "description": "How often to refresh CPU/RAM/GPU stats, in milliseconds."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^18.x",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^3.x",
+    "typescript": "^5.x"
+  }
+}
