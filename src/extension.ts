@@ -92,12 +92,12 @@ async function queryCpuPercent(): Promise<number> {
   switch (process.platform) {
     case 'win32': {
       const { stdout } = await execAsync(
-        'wmic cpu get loadpercentage /value',
+        'powershell -NoProfile -Command "(Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average"',
         { timeout: 5000 }
       );
-      const match = stdout.match(/LoadPercentage=(\d+)/);
-      if (match) return parseFloat(match[1]);
-      throw new Error('Could not parse CPU usage from wmic');
+      const val = parseFloat(stdout.trim());
+      if (!isNaN(val)) return val;
+      throw new Error('Could not parse CPU usage from Get-CimInstance');
     }
 
     case 'linux': {
@@ -150,9 +150,9 @@ export function activate(context: vscode.ExtensionContext): void {
   ramItem.name = 'RAM Usage';
   gpuItem.name = 'GPU VRAM';
 
-  cpuItem.text = '$(pulse) CPU: …';
-  ramItem.text = '$(database) RAM: …';
-  gpuItem.text = '$(circuit-board) GPU: …';
+  cpuItem.text = '$(pulse) …';
+  ramItem.text = '$(database) …';
+  gpuItem.text = '$(circuit-board) …';
   gpuItem.command = 'cpuRamGpuStatus.selectGpu';
 
   cpuItem.show();
@@ -168,20 +168,20 @@ export function activate(context: vscode.ExtensionContext): void {
     // CPU
     try {
       const pct = await queryCpuPercent();
-      cpuItem.text = `$(pulse) CPU: ${pct.toFixed(2)}%`;
+      cpuItem.text = `$(pulse) ${pct.toFixed(2)}%`;
       cpuItem.tooltip = `CPU Usage: ${pct.toFixed(2)}%`;
     } catch (err) {
-      cpuItem.text = '$(pulse) CPU: N/A';
+      cpuItem.text = '$(pulse) N/A';
       cpuItem.tooltip = `Error reading CPU: ${String(err)}`;
     }
 
     // RAM
     try {
       const { usedGiB, totalGiB } = queryRam();
-      ramItem.text = `$(database) RAM: ${usedGiB.toFixed(2)}/${totalGiB.toFixed(2)} GB`;
+      ramItem.text = `$(database) ${usedGiB.toFixed(2)}/${totalGiB.toFixed(2)} GB`;
       ramItem.tooltip = `RAM: ${usedGiB.toFixed(2)} GB used / ${totalGiB.toFixed(2)} GB total`;
     } catch (err) {
-      ramItem.text = '$(database) RAM: N/A';
+      ramItem.text = '$(database) N/A';
       ramItem.tooltip = `Error reading RAM: ${String(err)}`;
     }
 
@@ -191,14 +191,14 @@ export function activate(context: vscode.ExtensionContext): void {
       cachedGpus = gpus;
 
       if (gpus.length === 0) {
-        gpuItem.text = '$(circuit-board) GPU: N/A';
+        gpuItem.text = '$(circuit-board) N/A';
         gpuItem.tooltip = 'No GPU detected. Ensure nvidia-smi or rocm-smi is on PATH.';
         return;
       }
 
       if (selectedGpuIndex >= gpus.length) selectedGpuIndex = 0;
       const gpu = gpus[selectedGpuIndex];
-      gpuItem.text = `$(circuit-board) GPU: ${gpu.usedMiB}/${gpu.totalMiB} MiB`;
+      gpuItem.text = `$(circuit-board) ${gpu.usedMiB}/${gpu.totalMiB} MiB`;
 
       const md = new vscode.MarkdownString();
       md.appendMarkdown(`**${gpu.name}**\n\nVRAM: ${gpu.usedMiB} MiB / ${gpu.totalMiB} MiB`);
@@ -207,7 +207,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       gpuItem.tooltip = md;
     } catch (err) {
-      gpuItem.text = '$(circuit-board) GPU: Error';
+      gpuItem.text = '$(circuit-board) Error';
       gpuItem.tooltip = `Error querying GPU: ${String(err)}`;
     }
   }
