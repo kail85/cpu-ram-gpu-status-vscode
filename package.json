@@ -2,7 +2,7 @@
   "name": "cpu-ram-gpu-status",
   "displayName": "CPU RAM GPU Status",
   "description": "Shows CPU usage, RAM usage, and GPU VRAM in the VS Code status bar.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "kylewang",
   "engines": {
     "vscode": "^1.74.0"
